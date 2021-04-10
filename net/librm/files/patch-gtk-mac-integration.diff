@@ -1,0 +1,30 @@
+--- rm/rmmain.c	2021-04-10 14:11:32.000000000 +0200
++++ rm/rmmain.c	2021-04-10 14:15:32.000000000 +0200
+@@ -41,7 +41,7 @@
+ #include <rm/rmpassword.h>
+ #include <rm/rmlog.h>
+ 
+-#ifdef __APPLE__
++#if defined(__APPLE__) && defined(GTK_MAC_INTEGRATION)
+ #include <gtkmacintegration/gtkosxapplication.h>
+ #endif
+ 
+@@ -109,7 +109,7 @@
+ 	g_object_unref(directory);
+ 
+ 	ret = tmp;
+-#elif __APPLE__
++#elif defined(__APPLE__) && defined(GTK_MAC_INTEGRATION)
+ 	gchar *bundle = gtkosx_application_get_bundle_path();
+ 
+ 	if (gtkosx_application_get_bundle_id()) {
+--- meson.build	2021-04-10 14:21:09.000000000 +0200
++++ meson.build	2021-04-10 14:21:12.000000000 +0200
+@@ -65,7 +65,6 @@
+ # Include GTK integration libs for OS X
+ if os_darwin
+     rm_dep += dependency('gtk+-3.0')
+-    rm_dep += dependency('gtk-mac-integration-gtk3')
+ endif
+ 
+ rm_inc = include_directories('.')
