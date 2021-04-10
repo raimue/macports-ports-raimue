@@ -1,0 +1,51 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+
+PortSystem          1.0
+PortGroup           gitlab 1.0
+PortGroup           meson 1.0
+
+gitlab.setup        tabos rogerrouter 2.4.0
+categories          net
+platforms           darwin
+maintainers         {raimue @raimue} \
+                    openmaintainer 
+license             GPL-2
+
+description         Roger Router for FRITZ!Box
+long_description    Roger Router is an all-in-one solution for FRITZ!Box routers
+
+homepage            https://tabos.gitlab.io/project/rogerrouter/
+
+checksums           rmd160  6c57d91f4b1a14ddcb26bddf401e9d14cc8ce538 \
+                    sha256  af96ca9655f953c2163daf76bad76d1e51f0a2fad152e594ce243b881b951a30 \
+                    size    201511
+
+depends_build-append port:pkgconfig
+depends_lib         port:libcapi20 \
+                    port:librm \
+                    port:gtk3 \
+                    port:gettext \
+                    port:libsoup \
+                    port:ghostscript \
+                    port:libhandy
+depends_run         port:desktop-file-utils
+
+configure.args      -Denable-post-install=false
+
+post-activate {
+    system "${prefix}/bin/glib-compile-schemas ${prefix}/share/glib-2.0/schemas"
+    system "${prefix}/bin/update-desktop-database -q"
+    system "${prefix}/bin/gtk-update-icon-cache-3.0 -f -t ${prefix}/share/icons/hicolor"
+}
+
+variant docs description {Include API reference and tools documentation} {
+    depends_build-append    port:gtk-doc
+    configure.args-append   -Denable-documentation=true
+}
+
+notes "
+    To make use of the fax printer of Roger Router, you need to register a new printer in CUPS on your system:
+      lpadmin -p Roger-Router-Fax -m drv:///sample.drv/generic.ppd -v socket://localhost:9100/ -E -o PageSize=A4
+    Refer to the upstream website for detailed setup instructions in German:
+       ${homepage}
+"
